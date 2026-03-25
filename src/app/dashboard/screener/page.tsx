@@ -12,7 +12,7 @@ export default function ScreenerPage() {
           <div className="mb-8">
             <h1 className="text-4xl font-black tracking-tighter">Market Screener</h1>
             <p className="text-muted-foreground mt-2 text-lg">
-              Live AI analysis scanning the Top 50 Nifty index stocks to identify breakout and breakdown opportunities.
+              Live AI analysis scanning across multiple market segments to identify breakout and breakdown opportunities.
             </p>
           </div>
           
