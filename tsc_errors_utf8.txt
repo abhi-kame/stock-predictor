@@ -1,0 +1,6 @@
+﻿src/app/auth/sign-in/page.tsx(9,34): error TS2305: Module '"lucide-react"' has no exported member 'Github'.
+src/app/auth/sign-in/page.tsx(9,42): error TS2724: '"lucide-react"' has no exported member named 'Chrome'. Did you mean 'Home'?
+src/app/layout.tsx(3,8): error TS2882: Cannot find module or type declarations for side-effect import of './globals.css'.
+tailwind.config.ts(4,5): error TS2322: Type '["class"]' is not assignable to type 'DarkModeStrategy | undefined'.
+  Type '["class"]' is not assignable to type '["class", string]'.
+    Source has 1 element(s) but target requires 2.

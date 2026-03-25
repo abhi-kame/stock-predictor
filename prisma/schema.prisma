@@ -1,0 +1,115 @@
+// StockAI — Prisma Schema
+// Supports NextAuth.js + Watchlist + Alerts + Prediction caching
+
+generator client {
+  provider = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── NextAuth.js Required Models ───────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?   // For credentials provider (hashed)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  watchlist     Watchlist[]
+  alerts        Alert[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── Application Models ────────────────────────────────────────
+
+model Watchlist {
+  id        String   @id @default(cuid())
+  userId    String
+  symbol    String   // e.g. "RELIANCE.NS"
+  name      String?  // e.g. "Reliance Industries"
+  addedAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, symbol])
+  @@index([userId])
+}
+
+model Alert {
+  id         String    @id @default(cuid())
+  userId     String
+  symbol     String
+  targetPrice Float
+  direction  AlertDirection // ABOVE or BELOW
+  isActive   Boolean   @default(true)
+  triggered  Boolean   @default(false)
+  triggeredAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([symbol, isActive])
+}
+
+enum AlertDirection {
+  ABOVE
+  BELOW
+}
+
+model PredictionCache {
+  id         String   @id @default(cuid())
+  symbol     String
+  nextDay    Float
+  nextWeek   Float?
+  confidence Float
+  insight    String   @db.Text
+  createdAt  DateTime @default(now())
+
+  @@unique([symbol])
+  @@index([symbol])
+}
