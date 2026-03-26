@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runPrediction, HistoryPoint } from "@/lib/api/prediction-engine";
+import { runLSTMPrediction } from "@/lib/api/lstm-engine";
+import { runAdvancedLSTMPrediction } from "@/lib/api/advanced-lstm-engine";
+import { runGRUPrediction, runCNNPrediction, runHybridCNN_GRUPrediction } from "@/lib/api/gru-cnn-engine";
+import { runMetaLearnerPrediction } from "@/lib/api/meta-learner-engine";
 import YahooFinance from "yahoo-finance2";
 const yahooFinance = new YahooFinance();
 
 async function fetchHistoryFromYahoo(symbol: string): Promise<HistoryPoint[]> {
-  // Fetch ~1 year of daily data for best prediction quality
   const endDate = new Date();
   const startDate = new Date();
   startDate.setFullYear(startDate.getFullYear() - 1);
@@ -33,33 +36,28 @@ async function fetchHistoryFromYahoo(symbol: string): Promise<HistoryPoint[]> {
       volume: q.volume ?? 0,
     }));
 
-  // Sync the last data point with real-time market price if it exists
   if (quoteResult && quoteResult.regularMarketPrice && history.length > 0) {
     const todayStr = new Date().toISOString().split("T")[0];
     const lastPoint = history[history.length - 1];
 
     if (lastPoint.date === todayStr) {
       lastPoint.close = quoteResult.regularMarketPrice;
-      // Also adjust high/low if current price exceeds them
       lastPoint.high = Math.max(lastPoint.high ?? 0, lastPoint.close);
       lastPoint.low = Math.min(lastPoint.low ?? lastPoint.close, lastPoint.close);
     } else {
-      // If we don't have today's candle yet, add a synthetic one
       history.push({
         date: todayStr,
         open: quoteResult.regularMarketPrice,
         high: quoteResult.regularMarketPrice,
         low: quoteResult.regularMarketPrice,
         close: quoteResult.regularMarketPrice,
-        volume: 0, 
+        volume: 0,
       });
     }
   }
 
   return history;
 }
-
-import { runLSTMPrediction } from "@/lib/api/lstm-engine";
 
 async function handlePrediction(symbol: string, modelType: string = "ensemble") {
   const history = await fetchHistoryFromYahoo(symbol);
@@ -70,12 +68,23 @@ async function handlePrediction(symbol: string, modelType: string = "ensemble") 
     );
   }
 
-  if (modelType === "lstm") {
-    return await runLSTMPrediction(history, symbol);
+  switch (modelType) {
+    case "lstm":
+      return await runLSTMPrediction(history, symbol);
+    case "advanced-lstm":
+      return await runAdvancedLSTMPrediction(history, symbol, 7);
+    case "gru":
+      return await runGRUPrediction(history, symbol, 7);
+    case "cnn":
+      return await runCNNPrediction(history, symbol, 7);
+    case "cnn-gru":
+      return await runHybridCNN_GRUPrediction(history, symbol, 7);
+    case "meta":
+      return await runMetaLearnerPrediction(history, symbol, 7);
+    case "ensemble":
+    default:
+      return runPrediction(history, symbol, 7);
   }
-
-  const result = runPrediction(history, symbol, 7);
-  return result;
 }
 
 export async function GET(

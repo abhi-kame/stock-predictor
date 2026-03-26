@@ -99,6 +99,37 @@ const signalIcons: Record<string, React.ReactNode> = {
   STRONG_SELL: <ArrowDownRight className="w-3.5 h-3.5 text-rose-500" />,
 };
 
+const modelTitles: Record<string, string> = {
+  ensemble: 'StockAI Ensemble Intelligence',
+  lstm: 'TensorFlow LSTM Deep Learning',
+  'advanced-lstm': 'Advanced LSTM with Self-Attention',
+  gru: 'GRU Neural Network',
+  cnn: 'CNN Pattern Recognition',
+  'cnn-gru': 'CNN-GRU Hybrid Model',
+  meta: 'Meta-Learner Super-Ensemble',
+};
+
+const modelSubtitles: Record<string, string> = {
+  ensemble: '6-Model Mathematical Ensemble',
+  lstm: 'Standard LSTM Sequence Prediction',
+  'advanced-lstm': 'Bidirectional LSTM + Attention Mechanism',
+  gru: 'Gated Recurrent Unit - Fast & Efficient',
+  cnn: '1D Convolutional Pattern Detection',
+  'cnn-gru': 'CNN Features + GRU Temporal Modeling',
+  meta: 'All 6 Models with Adaptive Weighting',
+};
+
+function getModelTitle(model: string): string {
+  return modelTitles[model] || 'AI Prediction Engine';
+}
+
+function getModelSubtitle(model: string, bullishModels: number, totalModels: number): string {
+  if (model === 'meta') {
+    return `${bullishModels}/${totalModels} Models Bullish • Adaptive Stacking`;
+  }
+  return modelSubtitles[model] || `${bullishModels}/${totalModels} Bullish`;
+}
+
 export function PredictionChart({
   symbol,
   history,
@@ -212,24 +243,48 @@ export function PredictionChart({
                 <BrainCircuit className="w-6 h-6 text-primary" />
                 <div className="absolute inset-0 bg-primary/30 blur-md rounded-full animate-pulse" />
               </div>
-              {aiModel === 'lstm' ? 'TensorFlow LSTM Deep Learning' : 'StockAI Ensemble Intelligence'}
+              {getModelTitle(aiModel)}
             </CardTitle>
             <div className="text-xs text-muted-foreground flex flex-col sm:flex-row sm:items-center gap-2">
-              <span>{aiModel === 'lstm' ? 'Sequence Prediction' : `6-Model Ensemble • ${bullishModels}/${totalModels} Bullish`}</span>
+              <span>{getModelSubtitle(aiModel, bullishModels, totalModels)}</span>
               <span className="hidden sm:inline">•</span>
-              <div className="flex bg-muted rounded-full p-0.5 border border-muted-foreground/20 self-start sm:self-auto">
-                <button 
+              <div className="flex bg-muted rounded-full p-0.5 border border-muted-foreground/20 self-start sm:self-auto flex-wrap gap-1">
+                <button
                   onClick={() => setAiModel('ensemble')}
                   className={`text-[9px] px-2 py-0.5 rounded-full font-bold transition-all ${aiModel === 'ensemble' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
                 >
-                  Math Ensemble
+                  Ensemble
                 </button>
-                <button 
+                <button
                   onClick={() => setAiModel('lstm')}
-                  className={`text-[9px] px-2 py-0.5 rounded-full font-bold transition-all flex items-center gap-1 ${aiModel === 'lstm' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                  className={`text-[9px] px-2 py-0.5 rounded-full font-bold transition-all ${aiModel === 'lstm' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                 >
-                  <Zap className="w-2.5 h-2.5" />
-                  LSTM NeuNet
+                  LSTM
+                </button>
+                <button
+                  onClick={() => setAiModel('advanced-lstm')}
+                  className={`text-[9px] px-2 py-0.5 rounded-full font-bold transition-all ${aiModel === 'advanced-lstm' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                >
+                  LSTM+
+                </button>
+                <button
+                  onClick={() => setAiModel('gru')}
+                  className={`text-[9px] px-2 py-0.5 rounded-full font-bold transition-all ${aiModel === 'gru' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                >
+                  GRU
+                </button>
+                <button
+                  onClick={() => setAiModel('cnn')}
+                  className={`text-[9px] px-2 py-0.5 rounded-full font-bold transition-all ${aiModel === 'cnn' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                >
+                  CNN
+                </button>
+                <button
+                  onClick={() => setAiModel('meta')}
+                  className={`text-[9px] px-2 py-0.5 rounded-full font-bold transition-all flex items-center gap-1 ${aiModel === 'meta' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                >
+                  <BrainCircuit className="w-2.5 h-2.5" />
+                  Meta
                 </button>
               </div>
             </div>

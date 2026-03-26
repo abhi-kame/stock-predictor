@@ -20,8 +20,8 @@ interface StockState {
   setSelectedSymbol: (symbol: string) => void;
   selectedRange: string;
   setSelectedRange: (range: string) => void;
-  aiModel: 'ensemble' | 'lstm';
-  setAiModel: (model: 'ensemble' | 'lstm') => void;
+  aiModel: 'ensemble' | 'lstm' | 'advanced-lstm' | 'gru' | 'cnn' | 'cnn-gru' | 'meta';
+  setAiModel: (model: 'ensemble' | 'lstm' | 'advanced-lstm' | 'gru' | 'cnn' | 'cnn-gru' | 'meta') => void;
   watchlist: WatchlistItem[];
   alerts: Alert[];
   loading: boolean;
